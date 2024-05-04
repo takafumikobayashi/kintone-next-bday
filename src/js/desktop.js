@@ -47,8 +47,9 @@
 
 function handleUpdateBirthday() {
     const appId = kintone.app.getId();
-    const dateFieldCode = '次回誕生日'; // 日付フィールドのフィールドコード
-    const arlrtFieldCode = '子ども氏名'; // 更新対象者のフィールドコード
+    const config = kintone.plugin.app.getConfig(PLUGIN_ID);
+    const dateFieldCode = config.targetDate; // 日付フィールドのフィールドコード
+    const arlrtFieldCode = config.targetDate_disp; // 更新対象者のフィールドコード
     const today = new Date();
     const todayString = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
