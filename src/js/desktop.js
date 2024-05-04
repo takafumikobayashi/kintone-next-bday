@@ -23,8 +23,8 @@
     // ボタンのクリックイベントを設定
     button.onclick = function() {
         swal({
-            title: '次回誕生日を更新しますか？',
-            text: "次回誕生日が過去になっているレコードを一括で更新します。",
+            title: dateFieldCode + 'を更新しますか？',
+            text:  dateFieldCode + "が過去になっているレコードを一括で更新します。",
             icon: 'info',
             buttons: {
                 cancel: "いいえ",
@@ -40,7 +40,7 @@
                     handleUpdateBirthday(dateFieldCode, alertFieldCode);
                     break;
                 default:
-                    console.log('誕生日更新処理がキャンセルされました。');
+                    console.log('日付一括更新処理がキャンセルされました。');
             }
         });
     };
@@ -70,7 +70,7 @@ function handleUpdateBirthday(targetDateFieldCode, targetDateFieldCode_disp) {
         if (records.length === 0) {
             swal({
                 title: '更新対象レコードはありませんでした',
-                text: 'が過去の日付のレコードはありませんでした。',
+                text: targetDateFieldCode + 'が過去の日付のレコードはありませんでした。',
                 icon: 'info',
                 button: 'OK'
             });
