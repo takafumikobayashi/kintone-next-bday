@@ -1,0 +1,38 @@
+{
+  "manifest_version": 1,
+  "version": "1.0.0",
+  "type": "APP",
+  "desktop": {
+    "js": [
+      "js/desktop.js",
+      "https://js.cybozu.com/sweetalert/v2.1.2/sweetalert.min.js"
+    ],
+    "css": [
+      "css/51-modern-default.css",
+      "css/desktop.css"
+    ]
+  },
+  "icon": "image/icon.jpg",
+  "config": {
+    "html": "html/config.html",
+    "js": [
+      "js/config.js",
+      "https://js.cybozu.com/sweetalert/v2.1.2/sweetalert.min.js"
+    ],
+    "css": [
+      "css/51-modern-default.css",
+      "css/config.css"
+    ],
+    "required_params": [
+      "targetDate"
+    ]
+  },
+  "name": {
+    "ja": "kintone 日付項目年次一括更新プラグイン",
+    "en": "kintone Date field annual bulk update plugin"
+  },
+  "description": {
+    "ja": "指定した日付項目に対して、年次一括更新を行うプラグインです。",
+    "en": "This is a plugin that performs annual bulk updates for specified date items."
+  }
+}
