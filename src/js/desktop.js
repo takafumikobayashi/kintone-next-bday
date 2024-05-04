@@ -1,5 +1,5 @@
 (function (PLUGIN_ID) {
-  kintone.events.on(['app.record.index.show'], function(event) {
+    kintone.events.on(['app.record.index.show'], function(event) {
     let headerSpace = kintone.app.getHeaderMenuSpaceElement(); // ヘッダースペースを取得
 
     // 既に追加されたボタンがあるかチェック
@@ -11,9 +11,14 @@
     // 新しいボタンを作成
     let button = document.createElement('button');
     button.id = 'myCustomButton';
-    button.innerText = '誕生日更新';
+    button.innerText = '日付一括更新';
     button.className = 'kintoneplugin-button-normal'; // Kintoneのデフォルトボタンスタイル
     button.style.marginRight = '10px'; // 他のボタンとの間隔を適宜調整
+
+    // configで設定したフィールドコードを取得
+    const config = kintone.plugin.app.getConfig(PLUGIN_ID);
+    const dateFieldCode = config.targetDate; // 日付フィールドのフィールドコード
+    const alertFieldCode = config.targetDate_disp; // 更新対象者のフィールドコード
 
     // ボタンのクリックイベントを設定
     button.onclick = function() {
@@ -32,7 +37,7 @@
         .then((value) => {
             switch (value) {
                 case "execute":
-                    handleUpdateBirthday();
+                    handleUpdateBirthday(dateFieldCode, alertFieldCode);
                     break;
                 default:
                     console.log('誕生日更新処理がキャンセルされました。');
@@ -45,16 +50,13 @@
     return event;
 });
 
-function handleUpdateBirthday() {
+function handleUpdateBirthday(targetDateFieldCode, targetDateFieldCode_disp) {
     const appId = kintone.app.getId();
-    const config = kintone.plugin.app.getConfig(PLUGIN_ID);
-    const dateFieldCode = config.targetDate; // 日付フィールドのフィールドコード
-    const arlrtFieldCode = config.targetDate_disp; // 更新対象者のフィールドコード
     const today = new Date();
     const todayString = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
     // 過去の日付のみを取得するクエリ
-    const query = dateFieldCode + " < \"" + todayString + "\" and " + dateFieldCode + " != \"\" order by " + dateFieldCode + " asc limit 500";
+    const query = targetDateFieldCode + " < \"" + todayString + "\" and " + targetDateFieldCode + " != \"\" order by " + targetDateFieldCode + " asc limit 500";
     const params = {
         app: appId,
         query: query
@@ -67,8 +69,8 @@ function handleUpdateBirthday() {
         // レコードが0件の場合の処理
         if (records.length === 0) {
             swal({
-                title: '更新対象者はいませんでした',
-                text: '次回誕生日が過去の日付のレコードはありませんでした。',
+                title: '更新対象レコードはありませんでした',
+                text: 'が過去の日付のレコードはありませんでした。',
                 icon: 'info',
                 button: 'OK'
             });
@@ -77,7 +79,7 @@ function handleUpdateBirthday() {
 
         // レコードごとに日付を更新
         records.forEach(function(record) {
-            let recordDate = new Date(record[dateFieldCode].value);
+            let recordDate = new Date(record[targetDateFieldCode].value);
             recordDate.setFullYear(recordDate.getFullYear() + 1);
 
             let updateParams = {
@@ -85,7 +87,7 @@ function handleUpdateBirthday() {
                 id: record['$id'].value,
                 record: {}
             };
-            updateParams.record[dateFieldCode] = {
+            updateParams.record[targetDateFieldCode] = {
                 value: recordDate.toISOString().split('T')[0] // 年月日のみを更新
             };
 
@@ -94,7 +96,7 @@ function handleUpdateBirthday() {
                 console.log('Record updated: ', updateResp);
                 swal({
                     title: '更新しました。',
-                    text: record[arlrtFieldCode].value + 'さんの誕生日を更新しました。',
+                    text: record[targetDateFieldCode_disp].value + 'の日付を更新しました。',
                     icon: 'success',
                     button: 'OK'
                 });
@@ -103,7 +105,7 @@ function handleUpdateBirthday() {
                 console.error('Update error: ', updateError);
                 swal({
                     title: 'エラーが発生しました。',
-                    text: record[arlrtFieldCode].value + 'さんの誕生日更新に失敗しました。',
+                    text: record[targetDateFieldCode_disp].value + 'の日付更新に失敗しました。',
                     icon: 'error',
                     button: 'OK'
                 });
@@ -118,5 +120,6 @@ function handleUpdateBirthday() {
             button: 'OK'
         });
     });
-  }
+}
+
 })(kintone.$PLUGIN_ID);
