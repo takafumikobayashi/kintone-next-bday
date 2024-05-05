@@ -50,76 +50,75 @@
     return event;
 });
 
-function handleUpdateBirthday(targetDateFieldCode, targetDateFieldCode_disp) {
-    const appId = kintone.app.getId();
-    const today = new Date();
-    const todayString = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    function handleUpdateBirthday(targetDateFieldCode, targetDateFieldCode_disp) {
+        const appId = kintone.app.getId();
+        const today = new Date();
+        const todayString = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-    // 過去の日付のみを取得するクエリ
-    const query = targetDateFieldCode + " < \"" + todayString + "\" and " + targetDateFieldCode + " != \"\" order by " + targetDateFieldCode + " asc limit 500";
-    const params = {
-        app: appId,
-        query: query
-    };
+        // 過去の日付のみを取得するクエリ
+        const query = targetDateFieldCode + " < \"" + todayString + "\" and " + targetDateFieldCode + " != \"\" order by " + targetDateFieldCode + " asc limit 500";
+        const params = {
+            app: appId,
+            query: query
+        };
 
-    // レコードを取得
-    kintone.api(kintone.api.url('/k/v1/records', true), 'GET', params, function(resp) {
-        let records = resp.records;
+        // レコードを取得
+        kintone.api(kintone.api.url('/k/v1/records', true), 'GET', params, function(resp) {
+            let records = resp.records;
 
-        // レコードが0件の場合の処理
-        if (records.length === 0) {
+            // レコードが0件の場合の処理
+            if (records.length === 0) {
+                swal({
+                    title: '更新対象レコードはありませんでした',
+                    text: targetDateFieldCode + 'が過去の日付のレコードはありませんでした。',
+                    icon: 'info',
+                    button: 'OK'
+                });
+                return; // ここで処理を終了
+            }
+
+            // レコードごとに日付を更新
+            records.forEach(function(record) {
+                let recordDate = new Date(record[targetDateFieldCode].value);
+                recordDate.setFullYear(recordDate.getFullYear() + 1);
+
+                let updateParams = {
+                    app: appId,
+                    id: record['$id'].value,
+                    record: {}
+                };
+                updateParams.record[targetDateFieldCode] = {
+                    value: recordDate.toISOString().split('T')[0] // 年月日のみを更新
+                };
+
+                // レコードの更新
+                kintone.api(kintone.api.url('/k/v1/record', true), 'PUT', updateParams, function(updateResp) {
+                    console.log('Record updated: ', updateResp);
+                    swal({
+                        title: '更新しました。',
+                        text: record[targetDateFieldCode_disp].value + 'の日付を更新しました。',
+                        icon: 'success',
+                        button: 'OK'
+                    });
+
+                }, function(updateError) {
+                    console.error('Update error: ', updateError);
+                    swal({
+                        title: 'エラーが発生しました。',
+                        text: record[targetDateFieldCode_disp].value + 'の日付更新に失敗しました。',
+                        icon: 'error',
+                        button: 'OK'
+                    });
+                });
+            });
+        }, function(error) {
+            console.error('Error retrieving records: ', error);
             swal({
-                title: '更新対象レコードはありませんでした',
-                text: targetDateFieldCode + 'が過去の日付のレコードはありませんでした。',
-                icon: 'info',
+                title: 'エラーが発生しました。',
+                text: 'レコードの取得に失敗しました。',
+                icon: 'error',
                 button: 'OK'
             });
-            return; // ここで処理を終了
-        }
-
-        // レコードごとに日付を更新
-        records.forEach(function(record) {
-            let recordDate = new Date(record[targetDateFieldCode].value);
-            recordDate.setFullYear(recordDate.getFullYear() + 1);
-
-            let updateParams = {
-                app: appId,
-                id: record['$id'].value,
-                record: {}
-            };
-            updateParams.record[targetDateFieldCode] = {
-                value: recordDate.toISOString().split('T')[0] // 年月日のみを更新
-            };
-
-            // レコードの更新
-            kintone.api(kintone.api.url('/k/v1/record', true), 'PUT', updateParams, function(updateResp) {
-                console.log('Record updated: ', updateResp);
-                swal({
-                    title: '更新しました。',
-                    text: record[targetDateFieldCode_disp].value + 'の日付を更新しました。',
-                    icon: 'success',
-                    button: 'OK'
-                });
-
-            }, function(updateError) {
-                console.error('Update error: ', updateError);
-                swal({
-                    title: 'エラーが発生しました。',
-                    text: record[targetDateFieldCode_disp].value + 'の日付更新に失敗しました。',
-                    icon: 'error',
-                    button: 'OK'
-                });
-            });
         });
-    }, function(error) {
-        console.error('Error retrieving records: ', error);
-        swal({
-            title: 'エラーが発生しました。',
-            text: 'レコードの取得に失敗しました。',
-            icon: 'error',
-            button: 'OK'
-        });
-    });
-}
-
+    }
 })(kintone.$PLUGIN_ID);

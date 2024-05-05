@@ -12,6 +12,16 @@
       "css/desktop.css"
     ]
   },
+  "mobile": {
+    "js": [
+      "js/mobile.js",
+      "https://js.cybozu.com/sweetalert/v2.1.2/sweetalert.min.js"
+    ],
+    "css": [
+      "css/51-modern-default.css",
+      "css/mobile.css"
+    ]
+  },
   "icon": "image/icon.jpg",
   "config": {
     "html": "html/config.html",

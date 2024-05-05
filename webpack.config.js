@@ -5,7 +5,7 @@ module.exports = {
   // webpack でバンドルする js のファイルを指定する
     entry: {
         desktop: './src/js/desktop.js',
-        // mobile: './src/js/mobile.js',
+        mobile: './src/js/mobile.js',
         config: './src/js/config.js',
     },
     // webpack でバンドルしたファイルが出力する先を指定する
