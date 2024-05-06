@@ -15,9 +15,6 @@
   selectMenu_disp.className = 'field-selection-disp';
   
   const config = kintone.plugin.app.getConfig(PLUGIN_ID);
-  if (config.message) {
-    messageEl.value = config.message;
-  }
 
   kintone.api('/k/v1/form', 'GET', {app: appId}, function(resp) {
 
